@@ -1,14 +1,16 @@
 package com.authentication.oAuth_2.helper;
 
+import jakarta.persistence.Entity;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 
 import java.util.Set;
 
+
 public class ClientRegisterData {
 
     private String clientName;
-    private Set<String> redirectUris;
-    private Set<String> postLogoutRedirectUris;
+    private Set<String> redirectURL;
+    private String postLogoutRedirectURL;
     private Set<String> scopes;
 
     public String getClientName() {
@@ -19,20 +21,20 @@ public class ClientRegisterData {
         this.clientName = clientName;
     }
 
-    public Set<String> getRedirectUris() {
-        return redirectUris;
+    public Set<String> getRedirectURL() {
+        return redirectURL;
     }
 
-    public void setRedirectUris(Set<String> redirectUris) {
-        this.redirectUris = redirectUris;
+    public void setRedirectURL(Set<String> redirectURL) {
+        this.redirectURL = redirectURL;
     }
 
-    public Set<String> getPostLogoutRedirectUris() {
-        return postLogoutRedirectUris;
+    public String getPostLogoutRedirectURL() {
+        return postLogoutRedirectURL;
     }
 
-    public void setPostLogoutRedirectUris(Set<String> postLogoutRedirectUris) {
-        this.postLogoutRedirectUris = postLogoutRedirectUris;
+    public void setPostLogoutRedirectURL(String postLogoutRedirectURL) {
+        this.postLogoutRedirectURL = postLogoutRedirectURL;
     }
 
     public Set<String> getScopes() {

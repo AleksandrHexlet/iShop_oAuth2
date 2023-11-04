@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Set;
 
 @Controller
-@RequestMapping("/oAuth")
+@RequestMapping("/oauth")
 public class RegisteredClientController {
     private RegisteredClientService registeredClientService;
 
@@ -28,15 +29,32 @@ public class RegisteredClientController {
     @PostMapping("/client/registration")
     public String clientRegistration(@Valid ClientRegisterData clientRegisterData,
                                      BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) return "clientRegistrationForm";
+        if (bindingResult.hasErrors()) return "ClientRegisterHTML";
         try {
             registeredClientService.clientRegistration(clientRegisterData);
         } catch (ResponseException responseException) {
             bindingResult.addError(new ObjectError("ErrorText", responseException.getMessage()));
 //            model.addAttribute("ErrorText", responseException.getMessage());
-            return "clientRegistrationForm";
+            return "ClientRegisterHTML";
         }
         return "";
     }
+
+    @GetMapping("/client/registration")
+    public String getClientRegistrationForm(){
+//            (ClientRegisterData clientRegisterData) {
+        return "ClientRegisterHTML";
+    }
+    @GetMapping("/trader/authorization")
+    public String getTraderAuthorizationForm() {
+        return "TraderLoginFormHTML";
+    }
+
+    @GetMapping("/q")
+    public String getClientRegistrationFormQ(){
+//            (ClientRegisterData clientRegisterData) {
+        return "VAsya";
+    }
+
 
 }

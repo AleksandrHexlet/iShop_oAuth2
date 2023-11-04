@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/adminHTML.css}">
+</head>
+<body>
+<form action="#" method="post" th:action="@{/oAuth/client/registration}" th:object="${clientRegisterData}">
+
+    <div>
+        <label for="clientName">Форма регистрации </label>
+        <input class="inputCSS" type="text" id="clientName" th:field="*{clientName}">
+        <!--        <input type="text" id="name" th:field="${category.name}"> -->
+        <br>
+        <span th:if="${#fields.hasErrors('clientName')}" th:errors="*{clientName}"></span>
+    </div>
+    <div>
+        <label for="redirectURL">Введите redirect URL</label>
+        <input type="text" id="redirectURL" th:field="*{redirectURL}">
+        <!--        <input type="text" id="name" th:field="${category.name}"> -->
+        <br>
+        <span th:if="${#fields.hasErrors('redirectURL')}" th:errors="*{redirectURL}"></span>
+    </div>
+
+    <label for="scopes">Выберите необходимые scopes из списка</label>
+    <select id="scopes" th:field="*{scopes}">
+        <option value="READ">Чтение</option>
+        <option value="WRITE">Запись</option>
+    </select>
+
+    <div>
+        <label for="postLogoutRedirectURL">Выйти из аккаунта</label>
+        <input type="text" id="postLogoutRedirectURL" th:field="*{postLogoutRedirectURL}">
+        <br>
+        <span th:if="${#fields.hasErrors('postLogoutRedirectURL')}" th:errors="*{postLogoutRedirectURL}"></span>
+    </div>
+
+    <button type="submit">Зарегистрироваться</button>
+
+</form>
+
+</body>
+</html>
+

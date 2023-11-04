@@ -26,17 +26,11 @@ public class RegisteredClientService {
     }
 
     public void clientRegistration(ClientRegisterData clientRegisterData) throws ResponseException {
-//        Consumer<Set<String>> redirectUrisConsumer = (setSTR) -> setSTR.stream().map((item) -> item);
-//        Consumer<Set<String>> scopeSET = (setScope) -> setScope.stream().map((item) -> item);
-//            .redirectUri(redirectUrisConsumer);
+
         Consumer<Set<String>> insertStringsToBuilderSet = (stringSet) -> stringSet
-                .addAll(clientRegisterData.getRedirectUris());
+                .addAll(clientRegisterData.getRedirectURL());
         Consumer<Set<String>> scopeSET = (stringSet) -> stringSet
                 .addAll(clientRegisterData.getScopes());
-//        на 49 строке я заполнил scope  через stream. Через consumer не получилось так как
-//  метод  .scope(clientRegisterData.getScopes().stream().map((scope)-> scope).toString()) просит строку,
-//  а не set<String>
-
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String id = passwordEncoder.encode(String.valueOf(Math.random()));
@@ -55,14 +49,10 @@ public class RegisteredClientService {
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
                 .build();
 
-        if(registeredClientRepository.findByClientId(clientId).getId().equals(null)) throw new ResponseException("Такой клиент уже существует");
-        // тут надо проверять по userName, по id проверять нет смысла т.к. мы его тут же и создаём
-        // на 44 строке и его ещё нет в базе данных. Я не нашел метода проверки по имени
-        // в registeredClientRepository, но попробовал создать свой репо и extend от него.
-        // Это надо обсудить :):):)
+        if(registeredClientRepository.findByClientId(clientRegisterData.getClientName()).equals(null)) throw new ResponseException("Такой клиент уже существует");
 
         registeredClientRepository.save(clientRegister);
-//        registeredClientRepository.findByClientID
+
 
     }
 }
