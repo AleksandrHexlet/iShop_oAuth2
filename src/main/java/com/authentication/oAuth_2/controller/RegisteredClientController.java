@@ -38,6 +38,7 @@ public class RegisteredClientController {
             System.out.println("clientRegisterData == " + clientRegisterData.getClientName() + " ; "
                     + clientRegisterData.getScopes() + " ; " + clientRegisterData.getRedirectURL());
         } catch (ResponseException responseException) {
+            System.out.println("clientRegistration error ===  " + responseException.getMessage());
             bindingResult.addError(new ObjectError("ErrorText", responseException.getMessage()));
 //            model.addAttribute("ErrorText", responseException.getMessage());
             return "ClientRegisterHTML";

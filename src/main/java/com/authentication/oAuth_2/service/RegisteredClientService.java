@@ -39,7 +39,7 @@ public class RegisteredClientService {
         String clientSecret = passwordEncoder.encode(String.valueOf(Math.random()));
 
 
-        RegisteredClient clientRegister = RegisteredClient.withId(id)
+        RegisteredClient clientRegister = RegisteredClient.withId(clientRegisterData.getClientName())
                 .clientId(clientId)
                 .clientSecret(clientSecret)
                 .scope(clientRegisterData.getScopes().stream().map((scope)-> scope).toString())
@@ -52,9 +52,9 @@ public class RegisteredClientService {
         System.out.println("SERVICE clientRegisterData == " + clientRegisterData.getClientName() + " ; "
                 + clientRegisterData.getScopes() + " ; " + clientRegisterData.getRedirectURL());
         System.out.println("Client Exist in DataBase  == " + registeredClientRepository
-                .findByClientId(clientRegisterData.getClientName()));
+                .findById(clientRegisterData.getClientName()));
 
-        if(registeredClientRepository.findByClientId(clientRegisterData.getClientName()) != null) throw new ResponseException("Такой клиент уже существует");
+        if(registeredClientRepository.findById(clientRegisterData.getClientName()) != null) throw new ResponseException("Client exist.Такой клиент уже существует");
 
         registeredClientRepository.save(clientRegister);
 
