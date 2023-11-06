@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>TraderLoginFormHTML</title>
 </head>
 <body>
-<form action="#" th:action="@{/trader/authorization}" method="post">
+<form action="#" th:action="@{/trader/authorization}" method="get">
     <div th:if="${param.failed}">Ошибка ввода данных авторизации</div>
     <div><label for="name">Имя пользователя</label>
         <input type="text" name="username" id="name" placeholder="логин"><br></div>

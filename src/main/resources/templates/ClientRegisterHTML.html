@@ -6,10 +6,10 @@
     <link rel="stylesheet" th:href="@{/adminHTML.css}">
 </head>
 <body>
-<form action="#" method="post" th:action="@{/oAuth/client/registration}" th:object="${clientRegisterData}">
+<form action="#" method="post" th:action="@{/oauth/client/registration}" th:object="${clientRegisterData}">
 
     <div>
-        <label for="clientName">Форма регистрации </label>
+        <label for="clientName">Введите ваше имя </label>
         <input class="inputCSS" type="text" id="clientName" th:field="*{clientName}">
         <!--        <input type="text" id="name" th:field="${category.name}"> -->
         <br>
@@ -25,13 +25,14 @@
 
     <label for="scopes">Выберите необходимые scopes из списка</label>
     <select id="scopes" th:field="*{scopes}">
-        <option value="READ">Чтение</option>
-        <option value="WRITE">Запись</option>
+        <option value="READ">READ</option>
+        <option value="WRITE">WRITE</option>
     </select>
 
     <div>
         <label for="postLogoutRedirectURL">Выйти из аккаунта</label>
-        <input type="text" id="postLogoutRedirectURL" th:field="*{postLogoutRedirectURL}">
+        <button type="submit"  id="postLogoutRedirectURL" th:button="*{postLogoutRedirectURL}">Выйти из аккаунта</button>
+<!--        <input type="text" id="postLogoutRedirectURL" th:field="*{postLogoutRedirectURL}">-->
         <br>
         <span th:if="${#fields.hasErrors('postLogoutRedirectURL')}" th:errors="*{postLogoutRedirectURL}"></span>
     </div>

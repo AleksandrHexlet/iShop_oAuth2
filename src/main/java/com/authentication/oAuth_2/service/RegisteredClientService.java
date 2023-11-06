@@ -26,7 +26,8 @@ public class RegisteredClientService {
     }
 
     public void clientRegistration(ClientRegisterData clientRegisterData) throws ResponseException {
-
+        System.out.println("SEVICE Before setValue clientRegisterData == " + clientRegisterData.getClientName() + " ; "
+                + clientRegisterData.getScopes() + " ; " + clientRegisterData.getRedirectURL());
         Consumer<Set<String>> insertStringsToBuilderSet = (stringSet) -> stringSet
                 .addAll(clientRegisterData.getRedirectURL());
         Consumer<Set<String>> scopeSET = (stringSet) -> stringSet
@@ -48,8 +49,12 @@ public class RegisteredClientService {
                 .redirectUris(insertStringsToBuilderSet)
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
                 .build();
+        System.out.println("SERVICE clientRegisterData == " + clientRegisterData.getClientName() + " ; "
+                + clientRegisterData.getScopes() + " ; " + clientRegisterData.getRedirectURL());
+        System.out.println("Client Exist in DataBase  == " + registeredClientRepository
+                .findByClientId(clientRegisterData.getClientName()));
 
-        if(registeredClientRepository.findByClientId(clientRegisterData.getClientName()).equals(null)) throw new ResponseException("Такой клиент уже существует");
+        if(registeredClientRepository.findByClientId(clientRegisterData.getClientName()) != null) throw new ResponseException("Такой клиент уже существует");
 
         registeredClientRepository.save(clientRegister);
 
