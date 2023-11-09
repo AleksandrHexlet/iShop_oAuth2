@@ -2,6 +2,7 @@ package com.authentication.oAuth_2.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,14 +24,15 @@ public class SecurityConfig {
 
 
     @Bean
-
-    public SecurityFilterChain permitRegistration(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain permitClients(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
+                .securityMatcher("/oauth/client/**")
                 .authorizeHttpRequests((authorize) -> authorize
                                 .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
-                                .requestMatchers("/oauth/client/registration").permitAll()
-                                .requestMatchers("/oauth/client/authorization/").permitAll()
+                                .requestMatchers("/oauth/client/registration","/oauth/client/authorization").permitAll()
                                 .requestMatchers("/oauth/client/authorization/success").authenticated()
+
 //                                .requestMatchers("/**").permitAll()
 //                        .anyRequest().authenticated()
                 )
@@ -47,14 +49,37 @@ public class SecurityConfig {
         return http.build();
     }
 
+
     @Bean
-    public PasswordEncoder passwordEncoder(){
-          PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    public SecurityFilterChain permitTrader(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests((authorize) -> authorize
+                                .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
+                                .requestMatchers("/oauth/trader/authorization").permitAll()
+//                                .requestMatchers("/**").permitAll()
+//                                .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .usernameParameter("username").passwordParameter("password")
+                        .loginPage("/oauth/trader/authorization") // getMapping
+                        .failureUrl("/oauth/trader/authorization?failed")
+                        .loginProcessingUrl("/oauth/trader/authorization")); // postMapping //in form ---> th:action="@{/oauth/trader/authorization}"
+
+//        http.formLogin(Customizer.withDefaults());
+
+        return http.build();
+    }
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder;
     }
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring() .requestMatchers("/resources/**", "/static/**");
+        return (web) -> web.ignoring().requestMatchers("/resources/**", "/static/**");
     }
 
 }
