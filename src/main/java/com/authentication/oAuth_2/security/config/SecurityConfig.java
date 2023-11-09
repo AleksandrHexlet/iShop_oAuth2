@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                                 .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
                                 .requestMatchers("/oauth/client/registration/**").permitAll()
-                                .requestMatchers("/oauth/client/login/**").permitAll()
+                                .requestMatchers("/oauth/client/authorization/**").permitAll()
 //                                .requestMatchers("/**").permitAll()
 //                        .anyRequest().authenticated()
                 )
