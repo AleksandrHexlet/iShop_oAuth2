@@ -9,11 +9,20 @@
 <form action="#" method="post" th:action="@{/oauth/client/registration}" th:object="${clientRegisterData}">
 
     <div>
-        <label for="clientName">Введите ваше имя </label>
+        <label for="clientName">Введите вашего приложения</label>
         <input class="inputCSS" type="text" id="clientName" th:field="*{clientName}">
         <!--        <input type="text" id="name" th:field="${category.name}"> -->
         <br>
         <span th:if="${#fields.hasErrors('clientName')}" th:errors="*{clientName}"></span>
+        <p th:if="${ErrorText}" th:text="${ErrorText}"></p>
+    </div>
+    <div>
+        <label for="password">Введите ваш пароль </label>
+       <input class="inputCSS" type="text" id="password" th:field="*{password}"> <!--по аннотации valid работает-->
+        <!--        <input type="text" id="name" th:field="${category.name}"> -->
+        <br>
+        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+        <p th:if="${ErrorText}" th:text="${ErrorText}"></p>
     </div>
     <div>
         <label for="redirectURL">Введите redirect URL</label>
@@ -21,20 +30,23 @@
         <!--        <input type="text" id="name" th:field="${category.name}"> -->
         <br>
         <span th:if="${#fields.hasErrors('redirectURL')}" th:errors="*{redirectURL}"></span>
+        <p th:if="${ErrorText}" th:text="${ErrorText}"></p>
     </div>
 
     <label for="scopes">Выберите необходимые scopes из списка</label>
-    <select id="scopes" th:field="*{scopes}">
-        <option value="READ">READ</option>
-        <option value="WRITE">WRITE</option>
+    <select id="scopes" th:field="*{scopes}" multiple>
+        <option value="read">READ</option>
+        <option value="write">WRITE</option>
+        <option value="edit">EDIT</option>
     </select>
 
     <div>
         <label for="postLogoutRedirectURL">Выйти из аккаунта</label>
-        <button type="submit"  id="postLogoutRedirectURL" th:button="*{postLogoutRedirectURL}">Выйти из аккаунта</button>
-<!--        <input type="text" id="postLogoutRedirectURL" th:field="*{postLogoutRedirectURL}">-->
+<!--        <button type="submit"  id="postLogoutRedirectURL" th:button="*{postLogoutRedirectURL}">Выйти из аккаунта</button>-->
+        <input type="text" id="postLogoutRedirectURL" th:field="*{postLogoutRedirectURL}">
         <br>
         <span th:if="${#fields.hasErrors('postLogoutRedirectURL')}" th:errors="*{postLogoutRedirectURL}"></span>
+    <p th:if="${ErrorText}" th:text="${ErrorText}"></p>
     </div>
 
     <button type="submit">Зарегистрироваться</button>

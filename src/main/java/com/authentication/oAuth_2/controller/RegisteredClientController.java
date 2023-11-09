@@ -2,9 +2,11 @@ package com.authentication.oAuth_2.controller;
 
 import com.authentication.oAuth_2.helper.ClientRegisterData;
 import com.authentication.oAuth_2.helper.ResponseException;
+import com.authentication.oAuth_2.helper.entity.ClientLoginData;
 import com.authentication.oAuth_2.service.RegisteredClientService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,21 +36,45 @@ public class RegisteredClientController {
         System.out.println("AFTER clientRegisterData == " + clientRegisterData.getClientName() + " ; "
                 + clientRegisterData.getScopes() + " ; " + clientRegisterData.getRedirectURL());
         try {
-            registeredClientService.clientRegistration(clientRegisterData);
+            RegisteredClient registeredClient =   registeredClientService.clientRegistration(clientRegisterData);
             System.out.println("clientRegisterData == " + clientRegisterData.getClientName() + " ; "
                     + clientRegisterData.getScopes() + " ; " + clientRegisterData.getRedirectURL());
+           model.addAttribute("clientId",registeredClient.getClientId());
+           model.addAttribute("clientSecret", registeredClient.getClientSecret());
+           model.addAttribute("clientSecretExpiresAt",registeredClient.getClientSecretExpiresAt());
+            return "redirect:/oauth/client/login/";
+//            return "redirect://client/registration/success";
+//            return "ClientRegisterHTMLSuccess";
         } catch (ResponseException responseException) {
             System.out.println("clientRegistration error ===  " + responseException.getMessage());
-            bindingResult.addError(new ObjectError("ErrorText", responseException.getMessage()));
-//            model.addAttribute("ErrorText", responseException.getMessage());
+//            bindingResult.addError(new ObjectError("ErrorText", responseException.getMessage()));
+            model.addAttribute("ErrorText", responseException.getMessage());
             return "ClientRegisterHTML";
         }
-        return "";
+
     }
 
-    @GetMapping("/client/registration")
-    public String getClientRegistrationForm(ClientRegisterData clientRegisterData) {
-        return "ClientRegisterHTML";
+//    @GetMapping("/client/registration")
+//    public String getClientRegistrationForm(ClientRegisterData clientRegisterData) {
+//
+//        return "ClientRegisterHTML";
+//    }
+    @GetMapping("/client/authorization")
+    public String getClientAuthorizationForm(ClientLoginData clientLoginData) {
+        return "ClientAuthorizationHTML";
+    }
+    @PostMapping("/client/authorization")
+    public boolean postClientAuthorizationForm(ClientLoginData clientLoginData) {
+        boolean isAuthorizationSuccess = true;
+        // надо написать сервис и сравнивать логин и пароль от клиента и логин/пароль с БД
+        // по логину доставай из БД ClientLoginData и сравнивай. Если логин и пароль от клиента
+        // совпали с логин и паролем из БД тогда делай return "redirect://client/authorization/success";
+        // если нет, тогда возвращай ошибку responseException. Делай try/catch как в clientRegistration
+        return isAuthorizationSuccess;
+    }
+    @GetMapping("/client/authorization/success")
+    public String getClientRegistrationFormSuccess(ClientRegisterData clientRegisterData) {
+        return "ClientAuthorizationSuccessHTML";
     }
 
     @GetMapping("/trader/authorization")

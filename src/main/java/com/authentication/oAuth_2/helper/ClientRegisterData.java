@@ -9,7 +9,9 @@ import java.util.Set;
 public class ClientRegisterData {
 
     private String clientName;
-    private Set<String> redirectURL;
+    private String password;
+    private String redirectURL;
+//    private Set<String> redirectURL;
     private String postLogoutRedirectURL;
     private Set<String> scopes;
 
@@ -21,11 +23,19 @@ public class ClientRegisterData {
         this.clientName = clientName;
     }
 
-    public Set<String> getRedirectURL() {
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRedirectURL() {
         return redirectURL;
     }
 
-    public void setRedirectURL(Set<String> redirectURL) {
+    public void setRedirectURL(String redirectURL) {
         this.redirectURL = redirectURL;
     }
 

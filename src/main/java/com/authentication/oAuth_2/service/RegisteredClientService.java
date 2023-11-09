@@ -2,16 +2,22 @@ package com.authentication.oAuth_2.service;
 
 import com.authentication.oAuth_2.helper.ClientRegisterData;
 import com.authentication.oAuth_2.helper.ResponseException;
+import com.authentication.oAuth_2.helper.entity.ClientLoginData;
+import com.authentication.oAuth_2.helper.repository.ClientLoginDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -19,34 +25,50 @@ import java.util.function.Consumer;
 @Service
 public class RegisteredClientService {
     private RegisteredClientRepository registeredClientRepository;
+    private ClientLoginDataRepository clientLoginDataRepository;
 
     @Autowired
-    public RegisteredClientService(RegisteredClientRepository registeredClientRepository) {
+    public RegisteredClientService(RegisteredClientRepository registeredClientRepository,
+                                   ClientLoginDataRepository clientLoginDataRepository) {
         this.registeredClientRepository = registeredClientRepository;
+        this.clientLoginDataRepository = clientLoginDataRepository;
     }
 
-    public void clientRegistration(ClientRegisterData clientRegisterData) throws ResponseException {
-        System.out.println("SEVICE Before setValue clientRegisterData == " + clientRegisterData.getClientName() + " ; "
-                + clientRegisterData.getScopes() + " ; " + clientRegisterData.getRedirectURL());
-        Consumer<Set<String>> insertStringsToBuilderSet = (stringSet) -> stringSet
-                .addAll(clientRegisterData.getRedirectURL());
-        Consumer<Set<String>> scopeSET = (stringSet) -> stringSet
-                .addAll(clientRegisterData.getScopes());
+    public RegisteredClient clientRegistration(ClientRegisterData clientRegisterData) throws ResponseException {
+
+//        Consumer<Set<String>> insertStringsToBuilderSet = (stringSet) -> stringSet
+//                .addAll(clientRegisterData.getRedirectURL());
+        if (registeredClientRepository.findById(clientRegisterData.getClientName().strip()) != null)
+            throw new ResponseException("Client exist.Такой клиент уже существует");
+        if (clientLoginDataRepository.findByClientName(clientRegisterData.getClientName().strip()) != null)
+            throw new ResponseException("Login exist .Такой логин уже существует");
+
+        Consumer<Set<String>> scopeSET = (stringSet) -> {
+            stringSet.addAll(clientRegisterData.getScopes());
+            stringSet.add(OidcScopes.OPENID);
+        };
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String id = passwordEncoder.encode(String.valueOf(Math.random()));
         String clientId = passwordEncoder.encode(String.valueOf(Math.random()));
         String clientSecret = passwordEncoder.encode(String.valueOf(Math.random()));
+        Instant clientIdIssuedAt = ZonedDateTime.now(ZoneId.systemDefault()).toInstant();
+        Instant clientSecretExpiresAt = ZonedDateTime.now(ZoneId.systemDefault()).plusMonths(6).toInstant();
 
-
-        RegisteredClient clientRegister = RegisteredClient.withId(clientRegisterData.getClientName())
+        RegisteredClient clientRegister = RegisteredClient.withId(clientRegisterData.getClientName().strip())
                 .clientId(clientId)
+//                .tokenSettings(clientRegisterData.getPassword().strip())
                 .clientSecret(clientSecret)
-                .scope(clientRegisterData.getScopes().stream().map((scope)-> scope).toString())
+                .clientIdIssuedAt(clientIdIssuedAt)
+                .clientSecretExpiresAt(clientSecretExpiresAt)
+//                .scope(clientRegisterData.getScopes().stream().map((scope)-> scope).toString())
+                .scopes(scopeSET)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUris(insertStringsToBuilderSet)
+//                .redirectUris(insertStringsToBuilderSet)
+                .redirectUri(clientRegisterData.getRedirectURL().strip())
+                .postLogoutRedirectUri(clientRegisterData.getPostLogoutRedirectURL().strip())
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
                 .build();
         System.out.println("SERVICE clientRegisterData == " + clientRegisterData.getClientName() + " ; "
@@ -54,11 +76,14 @@ public class RegisteredClientService {
         System.out.println("Client Exist in DataBase  == " + registeredClientRepository
                 .findById(clientRegisterData.getClientName()));
 
-        if(registeredClientRepository.findById(clientRegisterData.getClientName()) != null) throw new ResponseException("Client exist.Такой клиент уже существует");
+        String clientPassword = passwordEncoder.encode(String.valueOf(clientRegisterData.getPassword()));
+        ClientLoginData clientLoginData = new ClientLoginData(clientRegisterData.getClientName(), clientPassword);
+
 
         registeredClientRepository.save(clientRegister);
 
-
+        clientLoginDataRepository.save(clientLoginData);
+        return clientRegister;
     }
 }
 

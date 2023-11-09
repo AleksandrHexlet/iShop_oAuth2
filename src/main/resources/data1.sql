@@ -1,0 +1,4 @@
+--INSERT QUERY
+--DELETE QUERY
+--UPDATE QUERY
+--file_name data.sql
