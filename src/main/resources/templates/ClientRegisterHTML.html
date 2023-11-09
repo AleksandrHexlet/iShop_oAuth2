@@ -18,7 +18,7 @@
     </div>
     <div>
         <label for="password">Введите ваш пароль </label>
-       <input class="inputCSS" type="text" id="password" th:field="*{password}"> <!--по аннотации valid работает-->
+       <input class="inputCSS" type="text" id="password" name="password" th:field="*{password}"> <!--по аннотации valid работает-->
         <!--        <input type="text" id="name" th:field="${category.name}"> -->
         <br>
         <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>

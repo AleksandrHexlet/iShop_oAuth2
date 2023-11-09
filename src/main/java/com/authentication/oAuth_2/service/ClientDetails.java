@@ -1,19 +1,22 @@
 package com.authentication.oAuth_2.service;
 
+import com.authentication.oAuth_2.helper.entity.ClientLoginData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 
+import java.time.Instant;
 import java.util.Collection;
 
 public class ClientDetails implements UserDetails {
     private RegisteredClient registeredClient;
+    ClientLoginData clientLoginData;
 
-    @Autowired
-    public ClientDetails(RegisteredClient registeredClient) {
 
+    public ClientDetails(RegisteredClient registeredClient, ClientLoginData clientLoginData) {
         this.registeredClient = registeredClient;
+        this.clientLoginData = clientLoginData;
     }
 
     @Override
@@ -21,33 +24,46 @@ public class ClientDetails implements UserDetails {
         return null;
     }
 
+
+    public Instant getClientExpireAt() {
+        return registeredClient.getClientSecretExpiresAt();
+    }
+
+    public String getClientId() {
+        return registeredClient.getClientId();
+    }
+
+    public String getClientSecret() {
+        return registeredClient.getClientSecret();
+    }
+
     @Override
     public String getPassword() {
-        return null;
+        return clientLoginData.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return clientLoginData.getClientName();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

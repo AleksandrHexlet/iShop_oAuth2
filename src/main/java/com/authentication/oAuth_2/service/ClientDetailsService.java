@@ -1,6 +1,8 @@
 package com.authentication.oAuth_2.service;
 
 
+import com.authentication.oAuth_2.helper.entity.ClientLoginData;
+import com.authentication.oAuth_2.helper.repository.ClientLoginDataRepository;
 import com.authentication.oAuth_2.helper.repository.RegisteredClientRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,24 +17,22 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @Service
 public class ClientDetailsService implements UserDetailsService {
     private RegisteredClientRepository registeredClientRepository;
+    private ClientLoginDataRepository clientLoginDataRepository;
 
-
-    @Autowired
-    public ClientDetailsService(RegisteredClientRepository registeredClientRepository) {
-
+ @Autowired
+    public ClientDetailsService(RegisteredClientRepository registeredClientRepository, ClientLoginDataRepository clientLoginDataRepository) {
         this.registeredClientRepository = registeredClientRepository;
+        this.clientLoginDataRepository = clientLoginDataRepository;
     }
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("username -- " +username);
         RegisteredClient registeredClient = registeredClientRepository.findById(username);
+        ClientLoginData clientLoginData = clientLoginDataRepository.findByClientName(username);
         System.out.println("registeredClient.getClientName() == " + registeredClient.getClientName());
-        ClientDetails clientDetails = new ClientDetails(registeredClient);
+        ClientDetails clientDetails = new ClientDetails(registeredClient, clientLoginData);
+        System.out.println("clientLoginData === " + clientLoginData.getClientName());
         return clientDetails;
     }
 }
-
-//    Реализовать класс, имплементирующий UserDetailsService. В методе loadByUsername реализовать
-//    логику извлечения информации об аутентифицируемом клиенте из БД и создание
-//    экземпляра ClientDetails.

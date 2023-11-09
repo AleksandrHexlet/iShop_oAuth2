@@ -5,8 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -25,28 +28,33 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize) -> authorize
                                 .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
-                                .requestMatchers("/oauth/client/registration/**").permitAll()
-                                .requestMatchers("/oauth/client/authorization/**").permitAll()
+                                .requestMatchers("/oauth/client/registration").permitAll()
+                                .requestMatchers("/oauth/client/authorization/").permitAll()
+                                .requestMatchers("/oauth/client/authorization/success").authenticated()
 //                                .requestMatchers("/**").permitAll()
 //                        .anyRequest().authenticated()
                 )
-//                /client/authorization/success
                 .formLogin(form -> form
                         .usernameParameter("clientName").passwordParameter("password")
-                        .loginPage("/oauth/client/authorization")
+                        .loginPage("/oauth/client/authorization") // getMapping
                         .failureUrl("/oauth/client/authorization?failed")
-                        .loginProcessingUrl("/oauth/client/authorization") //in form ---> th:action="@{/oauth/client/authorization}"
+                        .loginProcessingUrl("/oauth/client/authorization") // // postMapping //in form ---> th:action="@{/oauth/client/authorization}"
                         .defaultSuccessUrl("/client/authorization/success").permitAll())
                 .logout(logout -> logout.logoutUrl("/oauth/client/logout")
                         .logoutSuccessUrl("/oauth/client/authorization").permitAll());
-        // ???? is it correct ?
-        // what else needs to be added ????
-
-
-
 //        http.formLogin(Customizer.withDefaults());
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+          PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder;
+    }
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring() .requestMatchers("/resources/**", "/static/**");
     }
 
 }

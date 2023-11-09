@@ -26,12 +26,15 @@ import java.util.function.Consumer;
 public class RegisteredClientService {
     private RegisteredClientRepository registeredClientRepository;
     private ClientLoginDataRepository clientLoginDataRepository;
+    private  PasswordEncoder passwordEncoder;
 
-    @Autowired
+@Autowired
     public RegisteredClientService(RegisteredClientRepository registeredClientRepository,
-                                   ClientLoginDataRepository clientLoginDataRepository) {
+                                   ClientLoginDataRepository clientLoginDataRepository,
+                                   PasswordEncoder passwordEncoder) {
         this.registeredClientRepository = registeredClientRepository;
         this.clientLoginDataRepository = clientLoginDataRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public RegisteredClient clientRegistration(ClientRegisterData clientRegisterData) throws ResponseException {
@@ -48,7 +51,7 @@ public class RegisteredClientService {
             stringSet.add(OidcScopes.OPENID);
         };
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
         String id = passwordEncoder.encode(String.valueOf(Math.random()));
         String clientId = passwordEncoder.encode(String.valueOf(Math.random()));
         String clientSecret = passwordEncoder.encode(String.valueOf(Math.random()));
@@ -76,9 +79,9 @@ public class RegisteredClientService {
         System.out.println("Client Exist in DataBase  == " + registeredClientRepository
                 .findById(clientRegisterData.getClientName()));
 
-        String clientPassword = passwordEncoder.encode(String.valueOf(clientRegisterData.getPassword()));
+        String clientPassword = passwordEncoder.encode(clientRegisterData.getPassword());
         ClientLoginData clientLoginData = new ClientLoginData(clientRegisterData.getClientName(), clientPassword);
-
+        System.out.println("clientLoginData == " + clientLoginData.getClientName() + " ; " + clientLoginData.getPassword());
 
         registeredClientRepository.save(clientRegister);
 
