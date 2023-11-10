@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-<!--    <link rel="stylesheet" th:href="@{/adminHTML.css}">-->
+    <link rel="stylesheet" th:href="@{/css/adminHTML.css}">
 </head>
 <body>
 <form action="#" method="post" th:action="@{/oauth/client/authorization}">
-    <p th:if="${param.failed}" class="errorInput">Ошибка ввода данных авторизации</p>
+    <p th:if="${param.failed}" th:class="errorInput">Ошибка ввода данных авторизации</p>
     <div>
         <label for="clientName">Введите ваш логин</label>
         <input class="inputCSS" type="text" name="clientName" id="clientName">

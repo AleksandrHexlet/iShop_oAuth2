@@ -17,6 +17,7 @@ public class Role {
         ROLE_CUSTOMER,
         ROLE_TRADER,
         ROLE_READONLY_ADMIN,
+        ROLE_CLIENT // владельцы клиентских приложений
     }
 
     public RoleType getRoleType() {

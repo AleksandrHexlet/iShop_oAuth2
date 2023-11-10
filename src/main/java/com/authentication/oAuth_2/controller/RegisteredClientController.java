@@ -1,23 +1,21 @@
 package com.authentication.oAuth_2.controller;
 
+
 import com.authentication.oAuth_2.helper.ClientRegisterData;
 import com.authentication.oAuth_2.helper.ResponseException;
-import com.authentication.oAuth_2.helper.entity.ClientLoginData;
+import com.authentication.oAuth_2.service.ClientDetails;
 import com.authentication.oAuth_2.service.RegisteredClientService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Set;
 
 @Controller
 @RequestMapping("/oauth")
@@ -66,7 +64,12 @@ public class RegisteredClientController {
     }
 
     @GetMapping("/client/authorization/success")
-    public String getClientRegistrationFormSuccess() {
+    public String getClientRegistrationFormSuccess(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        // обращаемся авторизованного клиента, передаем в html его данные
+        ClientDetails clientDetails = (ClientDetails) userDetails;
+        model.addAttribute("clientId", clientDetails.getClientId());
+        model.addAttribute("clientSecret", clientDetails.getClientSecret());
+        model.addAttribute("clientSecretExpiresAt", clientDetails.getClientExpireAt());
         return "ClientAuthorizationSuccessHTML";
     }
 
@@ -74,6 +77,5 @@ public class RegisteredClientController {
     public String getTraderAuthorizationForm() {
         return "TraderLoginFormHTML";
     }
-
 
 }

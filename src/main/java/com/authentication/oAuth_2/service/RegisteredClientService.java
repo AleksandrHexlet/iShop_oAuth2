@@ -2,10 +2,11 @@ package com.authentication.oAuth_2.service;
 
 import com.authentication.oAuth_2.helper.ClientRegisterData;
 import com.authentication.oAuth_2.helper.ResponseException;
-import com.authentication.oAuth_2.helper.entity.ClientLoginData;
-import com.authentication.oAuth_2.helper.repository.ClientLoginDataRepository;
+import com.authentication.oAuth_2.helper.entity.LoginData;
+import com.authentication.oAuth_2.helper.entity.Role;
+import com.authentication.oAuth_2.helper.repository.LoginDataRepository;
+import com.authentication.oAuth_2.helper.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -18,23 +19,24 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
 @Service
 public class RegisteredClientService {
+    private final RoleRepository roleRepository;
+    private final LoginDataRepository loginDataRepository;
     private RegisteredClientRepository registeredClientRepository;
-    private ClientLoginDataRepository clientLoginDataRepository;
     private  PasswordEncoder passwordEncoder;
 
-@Autowired
+    @Autowired
     public RegisteredClientService(RegisteredClientRepository registeredClientRepository,
-                                   ClientLoginDataRepository clientLoginDataRepository,
-                                   PasswordEncoder passwordEncoder) {
+                                   PasswordEncoder passwordEncoder, RoleRepository roleRepository,
+                                   LoginDataRepository loginDataRepository) {
         this.registeredClientRepository = registeredClientRepository;
-        this.clientLoginDataRepository = clientLoginDataRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
+        this.loginDataRepository = loginDataRepository;
     }
 
     public RegisteredClient clientRegistration(ClientRegisterData clientRegisterData) throws ResponseException {
@@ -43,7 +45,7 @@ public class RegisteredClientService {
 //                .addAll(clientRegisterData.getRedirectURL());
         if (registeredClientRepository.findById(clientRegisterData.getClientName().strip()) != null)
             throw new ResponseException("Client exist.Такой клиент уже существует");
-        if (clientLoginDataRepository.findByClientName(clientRegisterData.getClientName().strip()) != null)
+        if (loginDataRepository.findByUserName(clientRegisterData.getClientName().strip()).isPresent())
             throw new ResponseException("Login exist .Такой логин уже существует");
 
         Consumer<Set<String>> scopeSET = (stringSet) -> {
@@ -80,31 +82,20 @@ public class RegisteredClientService {
                 .findById(clientRegisterData.getClientName()));
 
         String clientPassword = passwordEncoder.encode(clientRegisterData.getPassword());
-        ClientLoginData clientLoginData = new ClientLoginData(clientRegisterData.getClientName(), clientPassword);
-        System.out.println("clientLoginData == " + clientLoginData.getClientName() + " ; " + clientLoginData.getPassword());
+        LoginData clientLoginData = new LoginData(clientRegisterData.getClientName(), clientPassword);
+        System.out.println("clientLoginData == " + clientLoginData.getUserName() + " ; " + clientLoginData.getPassword());
 
         registeredClientRepository.save(clientRegister);
 
-        clientLoginDataRepository.save(clientLoginData);
+        // назначаем роль владельцам клиентских приложений
+        Role clientRole = roleRepository.findByRoleType(Role.RoleType.ROLE_CLIENT).orElseGet(()->{
+            Role role = new Role();
+            role.setRoleType(Role.RoleType.ROLE_CLIENT);
+            return roleRepository.save(role);
+        });
+
+        clientLoginData.setRole(clientRole);
+        loginDataRepository.save(clientLoginData);
         return clientRegister;
     }
 }
-
-
-//        private String id;
-//        private String clientId;
-//        private Instant clientIdIssuedAt;
-//        private String clientSecret;
-//        private Instant clientSecretExpiresAt;
-//        private Set<ClientAuthenticationMethod> clientAuthenticationMethods;
-//        private Set<AuthorizationGrantType> authorizationGrantTypes;
-
-//        private ClientSettings clientSettings;
-//        private TokenSettings tokenSettings;
-
-
-//------------------------------------------
-//    private String clientName;
-//    private Set<String> redirectUris;
-//    private Set<String> postLogoutRedirectUris;
-//    private Set<String> scopes;

@@ -3,5 +3,5 @@
     width: 350px;
 }
 .errorInput{
- borderColor:red;
+     border: 2px solid red;
 }

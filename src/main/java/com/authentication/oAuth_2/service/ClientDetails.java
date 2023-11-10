@@ -1,27 +1,28 @@
 package com.authentication.oAuth_2.service;
 
-import com.authentication.oAuth_2.helper.entity.ClientLoginData;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.authentication.oAuth_2.helper.entity.LoginData;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 
 public class ClientDetails implements UserDetails {
     private RegisteredClient registeredClient;
-    ClientLoginData clientLoginData;
+    private LoginData clientLoginData;
 
 
-    public ClientDetails(RegisteredClient registeredClient, ClientLoginData clientLoginData) {
+    public ClientDetails(RegisteredClient registeredClient, LoginData clientLoginData) {
         this.registeredClient = registeredClient;
         this.clientLoginData = clientLoginData;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return List.of(new SimpleGrantedAuthority(clientLoginData.getRole().getRoleType().name()));
     }
 
 
@@ -44,7 +45,7 @@ public class ClientDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return clientLoginData.getClientName();
+        return clientLoginData.getUserName();
     }
 
     @Override
