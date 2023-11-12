@@ -2,6 +2,7 @@ package com.authentication.oAuth_2.service;
 
 
 import com.authentication.oAuth_2.helper.entity.LoginData;
+import com.authentication.oAuth_2.helper.entity.Role;
 import com.authentication.oAuth_2.helper.repository.LoginDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +34,7 @@ public class ClientDetailsService implements UserDetailsService {
         LoginData clientLoginData = clientLoginDataRepository.findByUserName(username)
                 .orElseThrow(()-> new UsernameNotFoundException("Такой клиент не зарегистрирован"));
         if (registeredClient == null) throw new UsernameNotFoundException("Такой клиент не зарегистрирован");
+        if (clientLoginData.getRole().getRoleType() != Role.RoleType.ROLE_CLIENT) throw new UsernameNotFoundException("Такой клиент не зарегистрирован");
         System.out.println("registeredClient.getClientName() == " + registeredClient.getClientName());
         ClientDetails clientDetails = new ClientDetails(registeredClient, clientLoginData);
         System.out.println("clientLoginData === " + clientLoginData.getUserName());
