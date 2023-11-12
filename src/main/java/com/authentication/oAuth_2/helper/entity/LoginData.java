@@ -15,7 +15,7 @@ public class LoginData {
     private String userName;
     @Size(min = 2,max = 99)
     private String password;
-    @OneToOne
+    @ManyToOne
     private Role role;
 
     public LoginData(String userName, String password) {
