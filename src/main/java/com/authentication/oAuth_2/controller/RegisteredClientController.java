@@ -77,5 +77,9 @@ public class RegisteredClientController {
     public String getTraderAuthorizationForm() {
         return "TraderLoginFormHTML";
     }
+    @GetMapping("/trader/authorization/success")
+    public String getTraderAuthorizationFormSuccess() {
+        return "TraderLoginFormSuccessHTML";
+    }
 
 }
