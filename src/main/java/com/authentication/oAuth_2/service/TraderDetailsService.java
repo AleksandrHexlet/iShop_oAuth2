@@ -2,6 +2,7 @@ package com.authentication.oAuth_2.service;
 
 
 import com.authentication.oAuth_2.helper.entity.LoginData;
+import com.authentication.oAuth_2.helper.entity.Role;
 import com.authentication.oAuth_2.helper.repository.LoginDataRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,8 +23,10 @@ public class TraderDetailsService implements UserDetailsService {
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         LoginData loginData = loginDataRepository.findByUserName(username).orElseThrow(() ->
                 new UsernameNotFoundException(String.format("Пользователь с именем %s не зарегистрирован", username)));
+        if(loginData.getRole().getRoleType() != Role.RoleType.ROLE_TRADER) throw  new UsernameNotFoundException("Авторизация только для трейдеров. Не верный тип роли");
         GrantedAuthority authority = new SimpleGrantedAuthority(loginData.getRole().getRoleType().name());
         return new User(username, loginData.getPassword(), Set.of(authority));
     }

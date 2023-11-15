@@ -100,4 +100,5 @@ public class OAuthConfig {
 // В Controller @GetMapping("oauth2/authorize") нет.Он зашит по умолчанию в Spring Security.
 // запрос выглядит так ?client_id=VALUE&redirect_url=VALUE&scope=openid read
 
-//    http://localhost:9090/oauth2/authorize?client_id=$2a$10$dU8slMdM5sMSIDwI75sJeuwgdxr0DtfY28YhL.spiTYKLYTwNxmXK&response_type=code&redirect_uri=http://localhost:8888&scope=openid%20read
+//    http://localhost:9090/oauth2/authorize?client_id=$2a$10$XPItnalALTnwWei0WTnlAulpmP2RatO0REzG9m/QjgwgdZFstfmv.&response_type=code&redirect_uri=http://app.ru&scope=openid%20read
+
