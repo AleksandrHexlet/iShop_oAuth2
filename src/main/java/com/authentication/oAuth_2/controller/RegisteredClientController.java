@@ -41,11 +41,7 @@ public class RegisteredClientController {
                 + clientRegisterData.getScopes() + " ; " + clientRegisterData.getRedirectURL());
         try {
             RegisteredClient registeredClient = registeredClientService.clientRegistration(clientRegisterData);
-            System.out.println("clientRegisterData == " + clientRegisterData.getClientName() + " ; "
-                    + clientRegisterData.getScopes() + " ; " + clientRegisterData.getRedirectURL());
-            model.addAttribute("clientId", registeredClient.getClientId());
-            model.addAttribute("clientSecret", registeredClient.getClientSecret());
-            model.addAttribute("clientSecretExpiresAt", registeredClient.getClientSecretExpiresAt());
+
             return "redirect:/oauth/client/authorization";
 //            return "redirect://client/registration/success";
 //            return "ClientRegisterHTMLSuccess";

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 // Правильно хранить все регистрационные данные в одной таблице,
 // раз они между собой не отличаются
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class LoginData {
     @Id
     @GeneratedValue

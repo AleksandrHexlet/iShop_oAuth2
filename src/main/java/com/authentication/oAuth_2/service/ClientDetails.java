@@ -1,5 +1,6 @@
 package com.authentication.oAuth_2.service;
 
+import com.authentication.oAuth_2.helper.entity.ClientApp;
 import com.authentication.oAuth_2.helper.entity.LoginData;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,17 +13,17 @@ import java.util.List;
 
 public class ClientDetails implements UserDetails {
     private RegisteredClient registeredClient;
-    private LoginData clientLoginData;
+    private ClientApp clientApp;
 
 
-    public ClientDetails(RegisteredClient registeredClient, LoginData clientLoginData) {
+    public ClientDetails(RegisteredClient registeredClient, ClientApp clientApp) {
         this.registeredClient = registeredClient;
-        this.clientLoginData = clientLoginData;
+        this.clientApp = clientApp;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(clientLoginData.getRole().getRoleType().name()));
+        return List.of(new SimpleGrantedAuthority(clientApp.getRole().getRoleType().name()));
     }
 
 
@@ -35,17 +36,17 @@ public class ClientDetails implements UserDetails {
     }
 
     public String getClientSecret() {
-        return registeredClient.getClientSecret();
+        return clientApp.getClientSecretClean();
     }
 
     @Override
     public String getPassword() {
-        return clientLoginData.getPassword();
+        return clientApp.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return clientLoginData.getUserName();
+        return clientApp.getUserName();
     }
 
     @Override
