@@ -2,9 +2,9 @@ package com.authentication.oAuth_2.service;
 
 import com.authentication.oAuth_2.helper.ClientRegisterData;
 import com.authentication.oAuth_2.helper.ResponseException;
-import com.authentication.oAuth_2.helper.entity.LoginData;
+import com.authentication.oAuth_2.helper.entity.ClientApp;
 import com.authentication.oAuth_2.helper.entity.Role;
-import com.authentication.oAuth_2.helper.repository.LoginDataRepository;
+import com.authentication.oAuth_2.helper.repository.ClientAppRepository;
 import com.authentication.oAuth_2.helper.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,18 +25,18 @@ import java.util.function.Consumer;
 @Service
 public class RegisteredClientService {
     private final RoleRepository roleRepository;
-    private final LoginDataRepository loginDataRepository;
+    private final ClientAppRepository clientAppRepository;
     private RegisteredClientRepository registeredClientRepository;
     private  PasswordEncoder passwordEncoder;
 
     @Autowired
     public RegisteredClientService(RegisteredClientRepository registeredClientRepository,
                                    PasswordEncoder passwordEncoder, RoleRepository roleRepository,
-                                   LoginDataRepository loginDataRepository) {
+                                   ClientAppRepository clientAppRepository) {
         this.registeredClientRepository = registeredClientRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
-        this.loginDataRepository = loginDataRepository;
+        this.clientAppRepository = clientAppRepository;
     }
 
     public RegisteredClient clientRegistration(ClientRegisterData clientRegisterData) throws ResponseException {
@@ -45,7 +45,7 @@ public class RegisteredClientService {
 //                .addAll(clientRegisterData.getRedirectURL());
         if (registeredClientRepository.findById(clientRegisterData.getClientName().strip()) != null)
             throw new ResponseException("Client exist.Такой клиент уже существует");
-        if (loginDataRepository.findByUserName(clientRegisterData.getClientName().strip()).isPresent())
+        if (clientAppRepository.findByUserName(clientRegisterData.getClientName().strip()).isPresent())
             throw new ResponseException("Login exist .Такой логин уже существует");
 
         Consumer<Set<String>> scopeSET = (stringSet) -> {
@@ -53,10 +53,12 @@ public class RegisteredClientService {
             stringSet.add(OidcScopes.OPENID);
         };
 
+        String clientSecretClean = String.valueOf(Math.random());
 
+        String clientSecret = passwordEncoder.encode(clientSecretClean);
         String id = passwordEncoder.encode(String.valueOf(Math.random()));
         String clientId = passwordEncoder.encode(String.valueOf(Math.random()));
-        String clientSecret = passwordEncoder.encode(String.valueOf(Math.random()));
+
         Instant clientIdIssuedAt = ZonedDateTime.now(ZoneId.systemDefault()).toInstant();
         Instant clientSecretExpiresAt = ZonedDateTime.now(ZoneId.systemDefault()).plusMonths(6).toInstant();
 
@@ -82,8 +84,7 @@ public class RegisteredClientService {
                 .findById(clientRegisterData.getClientName()));
 
         String clientPassword = passwordEncoder.encode(clientRegisterData.getPassword());
-        LoginData clientLoginData = new LoginData(clientRegisterData.getClientName(), clientPassword);
-        System.out.println("clientLoginData == " + clientLoginData.getUserName() + " ; " + clientLoginData.getPassword());
+        ClientApp clientApp = new ClientApp(clientRegisterData.getClientName(), clientPassword,clientSecretClean);
 
         registeredClientRepository.save(clientRegister);
 
@@ -94,8 +95,9 @@ public class RegisteredClientService {
             return roleRepository.save(role);
         });
 
-        clientLoginData.setRole(clientRole);
-        loginDataRepository.save(clientLoginData);
+        clientApp.setRole(clientRole);
+
+        clientAppRepository.save(clientApp);
         return clientRegister;
     }
 }

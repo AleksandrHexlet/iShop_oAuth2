@@ -6,7 +6,7 @@
     <link rel="stylesheet" th:href="@{/css/adminHTML.css}">
 </head>
 <body>
-<form action="#" method="post" th:action="@{/oauth/client/authorization}">
+<form action="#" method="post" th:action="@{/oauth/clientApp/authorization}">
     <p th:if="${param.failed}" th:class="errorInput">Ошибка ввода данных авторизации</p>
     <div>
         <label for="clientName">Введите ваш логин</label>
