@@ -59,10 +59,9 @@ public class SecurityConfig {
                 // установили ответственного за авторизацию владельцев клиентских приложений
                 .authenticationProvider(clientAuthenticationProvider())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
                         .requestMatchers("/oauth/client/registration", "/oauth/client/authorization").permitAll()
                         // сделаем правильно, с ролями
-                        .requestMatchers("/oauth/client/authorization/success").hasRole("CLIENT")
+                        .requestMatchers("/oauth/client/**").hasRole("CLIENT")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -72,7 +71,8 @@ public class SecurityConfig {
                         .loginProcessingUrl("/oauth/client/authorization") // // postMapping //in form ---> th:action="@{/oauth/client/authorization}"
                         // не было oauth в defaultSuccessUrl
                         .defaultSuccessUrl("/oauth/client/authorization/success").permitAll())
-                .logout(logout -> logout.logoutUrl("/oauth/client/logout")
+                .logout(logout -> logout
+                        .logoutUrl("/oauth/client/logout")
                         .logoutSuccessUrl("/oauth/client/authorization").permitAll());
 //        http.formLogin(Customizer.withDefaults());
         return http.build();
@@ -82,9 +82,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain permitTrader(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
+                .securityMatcher("/oauth/trader/**")
                 .authenticationProvider(traderAuthenticationProvider())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
                         .requestMatchers("/oauth/trader/authorization").permitAll()
                         // разрешаем всем запросы к static, css и тп папкам
                         .requestMatchers("/css/**").permitAll()
